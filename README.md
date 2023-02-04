@@ -6,6 +6,7 @@ https://github.com/aharon80/-python--Time-study-counter-database.git
 
 # -python--Time-study-counter-database
 The project I did was supposed to be for me but I also wanted to share it with anyone who would like to use it
+didnt test it too much for bugs now my time in onther goal!
 
 #what this program is doing?
 # count the time and data and what you learn and tells u how much you sduied 
