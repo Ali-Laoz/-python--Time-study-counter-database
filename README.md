@@ -1,4 +1,4 @@
-!!!!!its only source code (not the working program)!!!!!
+# !!!!!its only source code (not the working program)!!!!!
 
 
 link to the exe file 
@@ -8,8 +8,8 @@ https://github.com/aharon80/-python--Time-study-counter-database.git
 The project I did was supposed to be for me but I also wanted to share it with anyone who would like to use it
 didnt test it too much for bugs because my time in another goal!
 
-#what this program is doing?
-# count the time and saves the date/time and what you studied and tells u how much you time you studied 
+# what this program is doing?
+## ---Saves the  date/time and what you studied then tells u how much time you studied---
 1-u can set time to start counting by format hh:mm:ss
 2-show u last studiy subject_name date start_time end_time and how much you studied hh:mm:ss
 3-show u tody studiy times by format hh:mm:ss
