@@ -45,6 +45,10 @@ FirstTimeSec=0
 datetimeStart=None
 study=""
 time_sec=0
+##is the timers up?
+timer_is_up=False
+##is the timer is stated?
+timer_started=False
 
 
 # Define a function to print the text in a loop
@@ -144,6 +148,7 @@ def countDownIsOver():
     running=False
     test=None
     global study
+    global timer_is_up
 
     global FirstTimeHour
     global FirstTimeMin
@@ -154,6 +159,7 @@ def countDownIsOver():
     print(FirstTimeMin)
     print(FirstTimeSec)
 
+    timer_is_up=True
 
     toast=Notification(app_id="Times from me",title="Time Countdown",msg="Time's up",duration="long",icon="")
     toast.set_audio(audio.LoopingAlarm9,loop=True)
@@ -162,14 +168,51 @@ def countDownIsOver():
     Ms_DataBase.DataBase_insert(datetimeStart,study,time_sec)
     last_study_label_var.set(study)
 
-    times_sec=Ms_DataBase.selectTimeBYSecAndDate()
-    st=str(datetime.timedelta(seconds=times_sec))
-    lerned_today_label_var.set(st)
-
     hour.set(FirstTimeHour)
     minute.set(FirstTimeMin)
     second.set(FirstTimeSec)
 
+    ##last study
+    first_name_list=Ms_DataBase.selectFirstRow()
+    learned=functions.func(first_name_list)
+    last_study_label_var.set(learned)
+
+    ###today
+    times_sec=Ms_DataBase.selectTimeBYSecAndDate()
+    st=str(datetime.timedelta(seconds=times_sec))
+    lerned_today_label_var.set(st)
+
+    ###week
+    studied_this_week_by_sec=Ms_DataBase.selectTimeBYSecAndDateWeek()
+    studied_this_week_by_sec_str=str(datetime.timedelta(seconds=studied_this_week_by_sec))
+    last_week_label_var.set(studied_this_week_by_sec_str)
+
+    ###month
+    studied_this_month_by_sec=Ms_DataBase.selectTimeBYSecAndDateMonth()
+    studied_this_month_by_sec_str=str(datetime.timedelta(seconds=studied_this_month_by_sec))
+    last_month_label_var.set(studied_this_month_by_sec_str)
+
+    ###year
+    studied_this_year_by_sec=Ms_DataBase.selectTimeBYSecAndDateYear()
+    studied_this_year_by_sec_str=str(datetime.timedelta(seconds=studied_this_year_by_sec))
+    last_year_label_var.set(studied_this_year_by_sec_str)
+
+    ###all the time
+    studied_all_time=Ms_DataBase.selectTimeBYSecAndDateAll_Time()
+    studied_all_time=str(datetime.timedelta(seconds=studied_all_time))
+    studied_all_time_label_var.set(studied_all_time)
+
+    ##### inseting form ms database recet 3 subjects in listbox
+    recent_list=Ms_DataBase.DataBase_Select_First_three_Subjects()
+    recent_list=functions.remove_symbols_from_list(recent_list)
+
+    recentListBox.delete(0,END)
+    counter=0
+    for i in recent_list:
+        #adding widget to Tab
+        counter+=1
+        recentListBox.insert(counter, i)
+    ############ done#########
     
 
 def emptyFunc():
@@ -184,6 +227,31 @@ def on_start():
    global last_study_time_hour
    global last_study_time_min
    global last_study_time_sec
+   global timer_started
+   global FirstTimeHour
+   global FirstTimeMin
+   global FirstTimeSec
+   global time_sec
+   try:
+        # the input provided by the user is
+        # stored in here 
+         FirstTimeHour=int(hour.get())
+         FirstTimeMin=int(minute.get())
+         FirstTimeSec=int(second.get())
+
+         hour.set("{0:2d}".format(FirstTimeHour))
+         minute.set("{0:2d}".format(FirstTimeMin))
+         second.set("{0:2d}".format(FirstTimeSec))
+      
+         start.config(state="enabled") #after setting the times
+         time_sec=FirstTimeHour*60*60
+         time_sec+=FirstTimeMin*60
+         time_sec+=FirstTimeSec
+         print("time_sec:"+str(time_sec)) 
+   except:
+        input_invalid=False
+        messagebox.showinfo("Invalid Input", "Please input the right value")
+        return
 
    datetimeStart=datetime.datetime.now().strftime("%H:%M:%S")
    
@@ -210,11 +278,13 @@ def on_start():
 
    if flag==False:
     messagebox.showinfo("Warning", "You didnt choose what to study")
-    on_stop()
     return
 
+   timer_started=True 
    start.config(state="disabled")
-   SetTimeCountdown.config(state="disabled")
+  # SetTimeCountdown.config(state="disabled")
+   pause1.config(state="enable")
+   stop.config(state="enable")
    running = True
    #Ms_DataBase.DataBase_print_all()
     #Ms_DataBase
@@ -244,6 +314,7 @@ def Set_Time_Countdown():
     except:
         input_invalid=False
         messagebox.showinfo("Invalid Input", "Please input the right value")
+        return
     pass
 
 # Define a function to stop the loop
@@ -254,18 +325,73 @@ def on_stop():
    global FirstTimeHour
    global FirstTimeMin
    global FirstTimeSec
+   global timer_is_up
+   global timer_started
+
+   if timer_is_up==False and timer_started==True:
+       answer_msg_box=messagebox.askquestion("Confirm","To update the database?")
+       if answer_msg_box=='yes':
+        remin_to_study_sec = int(hour.get())*3600 + int(minute.get())*60 + int(second.get())
+        was_time_sec=int(FirstTimeHour)*3600 + int(FirstTimeMin)*60 + int(FirstTimeSec)
+        print("Choosed yes")
+        study_time_sec=was_time_sec-remin_to_study_sec
+        Ms_DataBase.DataBase_insert(datetimeStart,study,study_time_sec)
+
+        ##last study
+        first_name_list=Ms_DataBase.selectFirstRow()
+        learned=functions.func(first_name_list)
+        last_study_label_var.set(learned)
+
+        ###today
+        times_sec=Ms_DataBase.selectTimeBYSecAndDate()
+        st=str(datetime.timedelta(seconds=times_sec))
+        lerned_today_label_var.set(st)
+
+        ###week
+        studied_this_week_by_sec=Ms_DataBase.selectTimeBYSecAndDateWeek()
+        studied_this_week_by_sec_str=str(datetime.timedelta(seconds=studied_this_week_by_sec))
+        last_week_label_var.set(studied_this_week_by_sec_str)
+
+        ###month
+        studied_this_month_by_sec=Ms_DataBase.selectTimeBYSecAndDateMonth()
+        studied_this_month_by_sec_str=str(datetime.timedelta(seconds=studied_this_month_by_sec))
+        last_month_label_var.set(studied_this_month_by_sec_str)
+
+        ###year
+        studied_this_year_by_sec=Ms_DataBase.selectTimeBYSecAndDateYear()
+        studied_this_year_by_sec_str=str(datetime.timedelta(seconds=studied_this_year_by_sec))
+        last_year_label_var.set(studied_this_year_by_sec_str)
+
+        ###all the time
+        studied_all_time=Ms_DataBase.selectTimeBYSecAndDateAll_Time()
+        studied_all_time=str(datetime.timedelta(seconds=studied_all_time))
+        studied_all_time_label_var.set(studied_all_time)
+
+            ##### inseting form ms database recet 3 subjects in listbox
+        recent_list=Ms_DataBase.DataBase_Select_First_three_Subjects()
+        recent_list=functions.remove_symbols_from_list(recent_list)
+
+        recentListBox.delete(0,END)
+        counter=0
+        for i in recent_list:
+            #adding widget to Tab
+            counter+=1
+            recentListBox.insert(counter, i)
+        ############ done#########
 
    hour.set("{00:2d}".format(FirstTimeHour))
    minute.set("{00:2d}".format(FirstTimeMin))
    second.set("{00:2d}".format(FirstTimeSec))
    start.config(state="enabled") #after setting the times 
-   SetTimeCountdown.config(state="enabled")
+   #SetTimeCountdown.config(state="enabled")
+   stop.config(state="disable")
+   pause1.config(state="disable")
    emptyFunc()
 
 
 def on_pause():
     start.config(state="enabled")
-    SetTimeCountdown.config(state="enabled")
+   # SetTimeCountdown.config(state="enabled")
     global running
     running = False
       
@@ -305,14 +431,14 @@ secondEntry.place(x=180,y=100)
 
 # Add a Button to start/stop the loop
 start = ttk.Button(win, text="Start", command=on_start)
-start.place(x=250,y=60)
+start.place(x=250,y=70)
 
 
-SetTimeCountdown = ttk.Button(win, text="Set Time Countdown", command=Set_Time_Countdown)
-SetTimeCountdown.place(x=250,y=90)
+#SetTimeCountdown = ttk.Button(win, text="Set Time Countdown", command=Set_Time_Countdown)
+#SetTimeCountdown.place(x=250,y=90)
 
 stop = ttk.Button(win, text="Stop", command=on_stop)
-stop.place(x=250,y=120)
+stop.place(x=250,y=110)
 
 pause1 = ttk.Button(win, text="pause", command=on_pause)
 pause1.place(x=250,y=150)
@@ -491,7 +617,8 @@ print(str(datetime.timedelta(seconds=sum)))
 #print("new Time:"+str(timenow))
 
 
-
+stop.config(state="disable")
+pause1.config(state="disable")
 
 
 ###today
@@ -534,6 +661,8 @@ second.set(last_study_time_sec)
 FirstTimeHour=last_study_time_hour
 FirstTimeMin=last_study_time_min
 FirstTimeSec=last_study_time_sec
+
+
 
 
 

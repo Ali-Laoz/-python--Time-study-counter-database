@@ -39,19 +39,21 @@ def DataBase_insert(datetimeStart,study,time_sec):
 def DataBase_Select_First_three_Subjects():
     conn = pyodbc.connect(r'Driver={Microsoft Access Driver (*.mdb, *.accdb)};DBQ=C:\My_subjects\Data_Study.accdb;')
     cursor = conn.cursor()
-    cursor.execute('SELECT Task_Name FROM Table1;')
+    cursor.execute('SELECT Task_Name FROM Table1 ORDER BY Task_Id DESC')
    
     recnt_list1=[]
     count=0
     element_count=0
     for row in cursor.fetchall():
-        count+=1
-        if count==1:
+        if count==0:
            recnt_list1.append(row)
+           count+=1
+           continue
 
         element_count=len(recnt_list1)        
         if row not in recnt_list1 and element_count<3:
-            recnt_list1.append(row)   
+            recnt_list1.append(row)
+        count+=1       
    
     return recnt_list1
 
