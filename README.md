@@ -18,7 +18,7 @@ didnt test it too much for bugs because my time in another goal!
 6-show u this year studiy times by format hh:mm:ss <br />
 7-show u all time studiy hh:mm:ss <br />
 
-#uses ms acsses for database and txt file <br />
+#uses Ms acsses as a database and txt file <br />
 #uses python as programming language and tkinter for gui <br />
 #i know there is chaos with the naming of vars and grammar <br />
 
