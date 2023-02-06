@@ -243,13 +243,14 @@ def on_start():
    global FirstTimeHour
    global FirstTimeMin
    global FirstTimeSec
+   global start_time_label_var
 
 
 
    try:
         # the input provided by the user is
         # stored in here##   
-
+        ## if its the first time
         if timer_paused==False:
 
           FirstTimeHour=int(hour.get())
@@ -264,7 +265,22 @@ def on_start():
           time_sec=FirstTimeHour*60*60
           time_sec+=FirstTimeMin*60
           time_sec+=FirstTimeSec
-          print("time_sec:"+str(time_sec)) 
+          
+          #start_time_label_var.set((datetime.datetime.time()))
+          timestart=datetime.datetime.now().strftime("%H:%M:%S")
+          timestart=str(timestart)
+          start_time_label_var.set(timestart)
+
+          timeend=datetime.datetime.now()+datetime.timedelta(seconds=time_sec)
+          timeend=str(timeend)
+          timeend=timeend[11:]
+          timeend=timeend[:8]
+          end_time_label_var.set(timeend)
+          #print("test:")
+          #print(timeend)
+
+
+
    except:
         input_invalid=False
         messagebox.showinfo("Invalid Input", "Please input the right value")
@@ -275,6 +291,15 @@ def on_start():
    if timer_paused==False:
         temp = int(hour.get())*3600 + int(minute.get())*60 + int(second.get())
         time_sec=temp
+
+   if timer_paused==True:
+      timeend=datetime.datetime.now()+datetime.timedelta(seconds=time_sec)
+      timeend=str(timeend)
+      timeend=timeend[11:]
+      timeend=timeend[:8]
+      end_time_label_var.set(timeend)
+      
+
    flag=False
    get = recentListBox.curselection()
    for i in get:
@@ -297,6 +322,7 @@ def on_start():
     messagebox.showinfo("Warning", "You didnt choose what to study")
     return
 
+   timer_paused=False
    timer_started=True 
    hourEntry.config(state="readonly")
    minuteEntry.config(state="readonly")
@@ -348,7 +374,12 @@ def on_stop():
    global timer_is_up
    global timer_started
    global timer_paused
+   global end_time_label_var
+   global start_time_label_var
    
+
+   start_time_label_var.set("")
+   end_time_label_var.set("")
 
    
    hourEntry.config(state="normal")
@@ -430,6 +461,8 @@ def on_pause():
     minuteEntry.config(state="readonly")
     secondEntry.config(state="readonly") 
     start.config(state="enabled")
+
+    end_time_label_var.set("")
    # SetTimeCountdown.config(state="enabled")
 
       
@@ -452,6 +485,7 @@ hour.set("00")
 minute.set("00")
 second.set("00")
 
+
 # Use of Entry class to take input from the user
 hourEntry= Entry(win, width=3, font=("Arial",18,""),
                  textvariable=hour)
@@ -464,6 +498,21 @@ minuteEntry.place(x=130,y=100)
 secondEntry= Entry(win, width=3, font=("Arial",18,""),
                    textvariable=second)
 secondEntry.place(x=180,y=100)
+
+###labels to show started time and end time
+start_time_static_label=Label(win,text="Start time:",relief=FLAT)
+start_time_static_label.place(x=70,y=150)
+
+start_time_label_var = StringVar()
+start_time_label = Label( win,textvariable=start_time_label_var,bd=1,relief=FLAT,font=("Arial",14,""))
+start_time_label.place(x=130,y=150)
+
+end_time_static_label=Label(win,text="End time:",relief=FLAT)
+end_time_static_label.place(x=70,y=180)
+
+end_time_label_var = StringVar()
+end_time_label = Label( win,textvariable=end_time_label_var,bd=1,relief=FLAT,font=("Arial",14,""))
+end_time_label.place(x=130,y=180)
 
 
 
