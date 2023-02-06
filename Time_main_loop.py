@@ -47,8 +47,12 @@ study=""
 time_sec=0
 ##is the timers up?
 timer_is_up=False
-##is the timer is stated?
+##is the timer is Started?
 timer_started=False
+##is the timer is Paused?
+timer_paused=False
+##is the timer is Stopped?
+timer_stop=False
 
 
 # Define a function to print the text in a loop
@@ -155,11 +159,18 @@ def countDownIsOver():
     global FirstTimeSec
     global datetimeStart
     global time_sec
+    global timer_paused
+    global timer_is_up
+    global timer_started
+    global timer_stop
     print(FirstTimeHour)
     print(FirstTimeMin)
     print(FirstTimeSec)
 
-    timer_is_up=True
+    timer_is_up=False
+    timer_started=False
+    timer_stop=False
+    timer_paused=False
 
     toast=Notification(app_id="Times from me",title="Time Countdown",msg="Time's up",duration="long",icon="")
     toast.set_audio(audio.LoopingAlarm9,loop=True)
@@ -228,26 +239,32 @@ def on_start():
    global last_study_time_min
    global last_study_time_sec
    global timer_started
+   global timer_paused
    global FirstTimeHour
    global FirstTimeMin
    global FirstTimeSec
-   global time_sec
+
+
+
    try:
         # the input provided by the user is
-        # stored in here 
-         FirstTimeHour=int(hour.get())
-         FirstTimeMin=int(minute.get())
-         FirstTimeSec=int(second.get())
+        # stored in here##   
 
-         hour.set("{0:2d}".format(FirstTimeHour))
-         minute.set("{0:2d}".format(FirstTimeMin))
-         second.set("{0:2d}".format(FirstTimeSec))
+        if timer_paused==False:
+
+          FirstTimeHour=int(hour.get())
+          FirstTimeMin=int(minute.get())
+          FirstTimeSec=int(second.get())
+
+          hour.set("{0:2d}".format(FirstTimeHour))
+          minute.set("{0:2d}".format(FirstTimeMin))
+          second.set("{0:2d}".format(FirstTimeSec))
       
-         start.config(state="enabled") #after setting the times
-         time_sec=FirstTimeHour*60*60
-         time_sec+=FirstTimeMin*60
-         time_sec+=FirstTimeSec
-         print("time_sec:"+str(time_sec)) 
+          start.config(state="enabled") #after setting the times
+          time_sec=FirstTimeHour*60*60
+          time_sec+=FirstTimeMin*60
+          time_sec+=FirstTimeSec
+          print("time_sec:"+str(time_sec)) 
    except:
         input_invalid=False
         messagebox.showinfo("Invalid Input", "Please input the right value")
@@ -255,9 +272,9 @@ def on_start():
 
    datetimeStart=datetime.datetime.now().strftime("%H:%M:%S")
    
-
-   temp = int(hour.get())*3600 + int(minute.get())*60 + int(second.get())
-   time_sec=temp
+   if timer_paused==False:
+        temp = int(hour.get())*3600 + int(minute.get())*60 + int(second.get())
+        time_sec=temp
    flag=False
    get = recentListBox.curselection()
    for i in get:
@@ -281,6 +298,9 @@ def on_start():
     return
 
    timer_started=True 
+   hourEntry.config(state="readonly")
+   minuteEntry.config(state="readonly")
+   secondEntry.config(state="readonly") 
    start.config(state="disabled")
   # SetTimeCountdown.config(state="disabled")
    pause1.config(state="enable")
@@ -327,6 +347,15 @@ def on_stop():
    global FirstTimeSec
    global timer_is_up
    global timer_started
+   global timer_paused
+   
+
+   
+   hourEntry.config(state="normal")
+   minuteEntry.config(state="normal")
+   secondEntry.config(state="normal") 
+   print("timer_is_up:"+str(timer_is_up))
+   print("timer_started:"+str(timer_started))
 
    if timer_is_up==False and timer_started==True:
        answer_msg_box=messagebox.askquestion("Confirm","To update the database?")
@@ -379,6 +408,7 @@ def on_stop():
             recentListBox.insert(counter, i)
         ############ done#########
 
+   timer_paused=False
    hour.set("{00:2d}".format(FirstTimeHour))
    minute.set("{00:2d}".format(FirstTimeMin))
    second.set("{00:2d}".format(FirstTimeSec))
@@ -390,10 +420,18 @@ def on_stop():
 
 
 def on_pause():
-    start.config(state="enabled")
-   # SetTimeCountdown.config(state="enabled")
     global running
     running = False
+    global timer_paused
+
+    timer_paused=True
+
+    hourEntry.config(state="readonly")
+    minuteEntry.config(state="readonly")
+    secondEntry.config(state="readonly") 
+    start.config(state="enabled")
+   # SetTimeCountdown.config(state="enabled")
+
       
 
 canvas = Canvas(win, bg="skyblue3", width=600, height=60)
