@@ -109,7 +109,7 @@ def print_text():
 
 
 
-#####about List#########
+#####prints item chooset only from the-> all list#########
 def printItemFromList():
     get = listbox.curselection()
     for i in get:
@@ -117,25 +117,34 @@ def printItemFromList():
 
 def deleteItemFromList():
     count=0
-
+    list1=[]
     deleted = listbox.curselection()
     for i in deleted:
         count=i
-        listbox.delete(i)
         print('One item Deleted')
+        #list1.append(listbox.get(i))
+        Ms_DataBase.deleteFromSubs(listbox.get(i))
+        listbox.delete(i)
+   	
 
-    File_handler.fileDeleteLine(count)    
+    
+   # File_handler.fileDeleteLine(count)    
 
 def addItemToTheList():
     if not str(add_item_to_list.get()):
         print("there is not text")
         return
 
-    File_handler.fileAppend(add_item_to_list.get())
+    global listbox    
+
+    list1=[]
+    list1.append(add_item_to_list.get())
+    Ms_DataBase.addNewSubToAList(list1)
     
     listbox.delete(0,END)
 
-    list_study=File_handler.fileRead()
+    list_study=Ms_DataBase.selectALLFromSubjects()
+    list_study=functions.remove_symbols_from_list(list_study)
     counter=0
     for i in list_study:
     #adding widget to Tab
@@ -176,7 +185,11 @@ def countDownIsOver():
     toast.set_audio(audio.LoopingAlarm9,loop=True)
     toast.show()
     
-    Ms_DataBase.DataBase_insert(datetimeStart,study,time_sec)
+    p=Ms_DataBase.get_ID_subject(study)
+    print(p)
+    if len(p)>0:
+       Ms_DataBase.DataBase_insert(p[0],datetimeStart,study,time_sec)
+
     last_study_label_var.set(study)
 
     hour.set(FirstTimeHour)
@@ -395,7 +408,11 @@ def on_stop():
         was_time_sec=int(FirstTimeHour)*3600 + int(FirstTimeMin)*60 + int(FirstTimeSec)
         print("Choosed yes")
         study_time_sec=was_time_sec-remin_to_study_sec
-        Ms_DataBase.DataBase_insert(datetimeStart,study,study_time_sec)
+        print("stduying:"+study)
+        p=Ms_DataBase.get_ID_subject(study)
+        print(p)
+        if len(p)>0:
+            Ms_DataBase.DataBase_insert(p[0],datetimeStart,study,study_time_sec)
 
         ##last study
         first_name_list=Ms_DataBase.selectFirstRow()
@@ -549,12 +566,15 @@ label_sec.place(x=190,y=80)
 subjects_Label = Label( win,text="All the subjects",relief=FLAT)
 subjects_Label.place(x=350,y=180)
 
-listbox = Listbox(win, width=45, height=8)
+listbox = Listbox(win, width=35, height=8)
 listbox.place(x=350,y=200)
 
-list_study=File_handler.fileRead()
+list_all_study=Ms_DataBase.selectALLFromSubjects()
+#list_all_study=functions.remove_symbols_from_list(list_all_study)
+
+#File_handler.fileRead()
 counter=0
-for i in list_study:
+for i in list_all_study:
     #adding widget to Tab
     counter+=1
     listbox.insert(counter, i)
@@ -570,7 +590,7 @@ recentListBox.place(x=250,y=200)
 
 ##### inseting form ms database recet 3 subjects in listbox
 recent_list=Ms_DataBase.DataBase_Select_First_three_Subjects()
-recent_list=functions.remove_symbols_from_list(recent_list)
+#recent_list=functions.remove_symbols_from_list(recent_list)
 
 for i in recent_list:
     #adding widget to Tab
@@ -578,20 +598,22 @@ for i in recent_list:
     recentListBox.insert(counter, i)
 ############ done#########
 
+btn0 = Button(win, text="Print", command=printItemFromList)
+btn0.place(x=350,y=350)
 
-
-btn2 = Button(win, text="Delete", command=deleteItemFromList)
-btn2.place(x=450,y=350)
 
 btn1 = Button(win, text="Add New Item", command=addItemToTheList)
-btn1.place(x=350,y=350)
+btn1.place(x=400,y=350)
 
 #StringVar
 add_item_to_list=StringVar()
 add_item_to_list.set("")
 add_To_List= Entry(win, width=10, font=("Arial",18,""),
                  textvariable=add_item_to_list)
-add_To_List.place(x=350,y=400)
+add_To_List.place(x=375,y=400)
+
+btn2 = Button(win, text="Delete", command=deleteItemFromList)
+btn2.place(x=500,y=350)
 
 
 #what do you study now
@@ -669,8 +691,33 @@ all_time_label.place(x=890,y=270)
 
 ##get time make it str
 
-   
-   
+##today learned subjects by sec and name and date labels
+
+week_last_sub_name_static1=Label( win,text="Week subject1:",bd=2,relief=FLAT,font=("Arial",14,"")) 
+week_last_sub_name_static1.place(x=700,y=400)
+
+week_sub_name_var1 = StringVar()
+week_sub_name_label1 = Label( win,textvariable=week_sub_name_var1,bd=2,relief=FLAT,font=("Arial",14,""))
+week_sub_name_label1.place(x=840,y=400)
+
+
+week_last_sub_name_static2=Label( win,text="Week subject2:",bd=2,relief=FLAT,font=("Arial",14,"")) 
+week_last_sub_name_static2.place(x=700,y=430)
+
+week_sub_name_var2 = StringVar()
+week_sub_name_label2 = Label( win,textvariable=week_sub_name_var2,bd=2,relief=FLAT,font=("Arial",14,""))
+week_sub_name_label2.place(x=840,y=430)
+
+
+week_last_sub_name_static3=Label( win,text="Week subject3:",bd=2,relief=FLAT,font=("Arial",14,"")) 
+week_last_sub_name_static3.place(x=700,y=460)
+
+week_sub_name_var3 = StringVar()
+week_sub_name_label3 = Label( win,textvariable=week_sub_name_var3,bd=2,relief=FLAT,font=("Arial",14,""))
+week_sub_name_label3.place(x=840,y=460)
+
+
+#########done############   
 sumPassedTime=Ms_DataBase.selectTimePassedRow()
 
 #for i in sumPassedTime:
@@ -738,9 +785,7 @@ studied_all_time_label_var.set(studied_all_time)
 last_study_time_sec=Ms_DataBase.selectTimeBYSecToday()
 last_study_time_min, last_study_time_sec = divmod(last_study_time_sec, 60)
 last_study_time_hour, last_study_time_min = divmod(last_study_time_min, 60)
-#last_study_time_hour=str(datetime.timedelta(seconds=studied_all_time))
-#last_study_time_min=str(datetime.timedelta(seconds=studied_all_time))
-#last_study_time_sec=str(last_study_time)
+
 hour.set(last_study_time_hour)
 minute.set(last_study_time_min)
 second.set(last_study_time_sec)
@@ -749,13 +794,38 @@ FirstTimeHour=last_study_time_hour
 FirstTimeMin=last_study_time_min
 FirstTimeSec=last_study_time_sec
 
+##geting from ms_database all today learned subjects by sec and name and date  
+recent_3_subs_names,recent_3_subs_secs=Ms_DataBase.DataBase_Select_First_three_Subjects_all_info()
+
+recnt_names,recntsecs=functions.selectThreeSubsFromSameWeek(recent_3_subs_secs,recent_3_subs_names)
+
+count=0
+recent_3_subs=""
+
+for i in recnt_names:
+    if count==0:
+        recent_3_subs=""
+        recent_3_subs=str(datetime.timedelta(seconds=recntsecs[count]))
+        week_sub_name_var1.set(i+"  "+recent_3_subs)
+    if count==1:
+        recent_3_subs=""
+        recent_3_subs=str(datetime.timedelta(seconds=recntsecs[count]))
+        week_sub_name_var2.set(i+"  "+recent_3_subs)  
+    if count==2:
+        recent_3_subs=""
+        recent_3_subs=str(datetime.timedelta(seconds=recntsecs[count]))
+        week_sub_name_var3.set(i+"  "+recent_3_subs)    
+    count+=1
 
 
 
 
 
-#print(first_name_list)
-#print("size:"+str(len(first_name_list)))
+#print(recent_3_subs_names)
+#print(recent_3_subs_secs)
+
+
+
 # Run a function to print text in window
 win.after(1000, print_text)
 
