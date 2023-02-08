@@ -12,7 +12,7 @@ import datetime    #import for times and data minupaltions
 from distutils import command
 from tkinter import * #import for gui and data minupaltions
 from tkinter import ttk #import for gui and data minupaltions
-from tkinter import messagebox #for notification in order 
+from tkinter import messagebox #for notification in order
 import winsound #for sound in order 
 import time 
 from pyparsing import sys
@@ -25,14 +25,14 @@ import sys
 import File_handler 
 import Ms_DataBase
 import functions
-
-
-
+import tikner_types
 
 win = Tk() 
 win.title("Time counter")
 # Set the size of the window
 win.geometry("1300x700")
+
+
 
 temp=0
 running = False
@@ -482,7 +482,20 @@ def on_pause():
     end_time_label_var.set("")
    # SetTimeCountdown.config(state="enabled")
 
-      
+#gets by minutes
+def set_min_by_button(btn_min):
+
+    if btn_min<60:
+        hour.set("{0:2d}".format(0))
+        minute.set("{0:2d}".format(btn_min))
+        second.set("{0:2d}".format(0))
+    else:
+        hour.set("{0:2d}".format(1))
+        minute.set("{0:2d}".format(0))
+        second.set("{0:2d}".format(0))    
+
+    pass
+
 
 canvas = Canvas(win, bg="skyblue3", width=600, height=60)
 canvas.create_text(150, 10, text="Click the Start/Stop to execute the Code", font=('', 13))
@@ -533,7 +546,7 @@ end_time_label.place(x=130,y=180)
 
 
 
-# Add a Button to start/stop the loop
+###### Add a Button to start/stop the loop#########
 start = ttk.Button(win, text="Start", command=on_start)
 start.place(x=250,y=70)
 
@@ -560,6 +573,34 @@ label_min.place(x=140,y=80)
 
 label_sec = Label( win,text="S",relief=FLAT)
 label_sec.place(x=190,y=80)
+
+btn_5min = ttk.Button(win, text="Set 5min", command=lambda: set_min_by_button(5))
+btn_5min.place(x=100,y=220)
+
+btn_10min = ttk.Button(win, text="Set 10min", command=lambda: set_min_by_button(10))
+btn_10min.place(x=100,y=250)
+
+btn_15min = ttk.Button(win, text="Set 15min", command=lambda: set_min_by_button(15))
+btn_15min.place(x=100,y=280)
+
+btn_20min = ttk.Button(win, text="Set 20min", command=lambda: set_min_by_button(20))
+btn_20min.place(x=100,y=310)
+
+btn_25min = ttk.Button(win, text="Set 25min", command=lambda: set_min_by_button(25))
+btn_25min.place(x=100,y=340)
+
+btn_30min = ttk.Button(win, text="Set 30min", command=lambda: set_min_by_button(30))
+btn_30min.place(x=100,y=370)
+
+btn_45min = ttk.Button(win, text="Set 45min", command=lambda: set_min_by_button(45))
+btn_45min.place(x=100,y=400)
+
+btn_1hour = ttk.Button(win, text="Set 1hour", command=lambda: set_min_by_button(60))
+btn_1hour.place(x=100,y=430)
+
+####################Done###########
+
+
 
 
 # ListBox for all the subjects
@@ -804,15 +845,12 @@ recent_3_subs=""
 
 for i in recnt_names:
     if count==0:
-        recent_3_subs=""
         recent_3_subs=str(datetime.timedelta(seconds=recntsecs[count]))
         week_sub_name_var1.set(i+"  "+recent_3_subs)
     if count==1:
-        recent_3_subs=""
         recent_3_subs=str(datetime.timedelta(seconds=recntsecs[count]))
         week_sub_name_var2.set(i+"  "+recent_3_subs)  
     if count==2:
-        recent_3_subs=""
         recent_3_subs=str(datetime.timedelta(seconds=recntsecs[count]))
         week_sub_name_var3.set(i+"  "+recent_3_subs)    
     count+=1
